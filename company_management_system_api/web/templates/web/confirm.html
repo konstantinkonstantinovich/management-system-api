@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <form action="" method="post">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="mt-2 text-center">Confirm your account</h1>
+            <hr class="mt-0 mb-4">
+            {{ form }}
+        </div>
+    </div>
+    <input type="submit"  class="btn btn-success w-100" value="Send">
+ </form>
+{% endblock %}
+
+

@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="card mt-5">
+      <div class="card-body" >
+          <p><em> This is vehicles log </em></p><hr>
+          <div id="log"></div>
+      </div>
+    </div>
+
+    <form method="post" class="mt-3" id="form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="office_id" class="form-label">Office id</label>
+            <input type="text" class="form-control" id="office_id" aria-describedby="emailHelp">
+            <div id="emailHelp" class="form-text">Enter valid id to get vehicles.</div>
+        </div>
+        <input type="submit"  class="btn btn-primary w-100" value="Send">
+    </form>
+
+    <div id="list" class="mt-4"></div>
+
+    <script>
+        let socket = new WebSocket(
+            "ws://0.0.0.0:8001/ws/vehicles"
+        )
+
+        socket.onopen = function (e) {
+            console.log('[open] Connection established')
+            console.log('[connected]')
+        }
+
+        socket.onmessage = function (event) {
+            let data = JSON.parse(event.data);
+
+            if (typeof data.report_vehicle !== 'undefined') {
+                render_report(data.report_vehicle)
+            } else {
+                render_list(data)
+            }
+        }
+        
+        function render_report(name) {
+            let log = document.getElementById('log')
+            let div = document.createElement('div')
+            let div_col_name_report = document.createElement('div')
+            let div_col_message = document.createElement('div')
+            let n = new Date();
+            div.classList.add('row');
+            div_col_name_report.classList.add('col-md-2')
+            div_col_name_report.classList.add('fw-bolder')
+            div_col_message.classList.add('col-md-10')
+            div_col_name_report.innerHTML += '[logs]'
+            div_col_message.innerHTML += 'Added a new vehicle named '
+                + name + ' ' + (n.getMonth() + 1) + '/' + n.getDate() + '/' + n.getFullYear();
+            div.appendChild(div_col_name_report)
+            div.appendChild(div_col_message)
+            log.appendChild(div)
+        }
+        
+        function render_list(list) {
+            let el = document.getElementById('list')
+
+            while (el.firstChild) {
+                el.removeChild(el.lastChild);
+            }
+
+            let ul = document.createElement('ul')
+            ul.classList.add('list-group')
+            for (const element of list) {
+                let li = document.createElement('li')
+                let div_row = document.createElement('div')
+                let div_col_name = document.createElement('div')
+                let div_col_plate = document.createElement('div')
+                let div_col_model = document.createElement('div')
+                let div_col_year = document.createElement('div')
+                li.classList.add('list-group-item')
+                div_row.classList.add('row')
+                div_col_name.classList.add('col-auto')
+                div_col_plate.classList.add('col-md-3')
+                div_col_model.classList.add('col-md-3')
+                div_col_year.classList.add('col-md-3')
+                div_col_name.innerHTML += element['name']
+                div_col_plate.innerHTML += element['licence_plate']
+                div_col_model.innerHTML += element['model']
+                div_col_year.innerHTML += element['year_of_manufacture']
+                div_row.appendChild(div_col_name)
+                div_row.appendChild(div_col_plate)
+                div_row.appendChild(div_col_model)
+                div_row.appendChild(div_col_year)
+                li.appendChild(div_row)
+                ul.appendChild(li)
+                el.appendChild(ul)
+            }
+        }
+
+        socket.onclose = function (event) {
+            console.log('[closed] Connection refused.')
+        }
+
+        const form = document.getElementById('form');
+
+        form.addEventListener('submit', function (e) {
+            let office_id = document.getElementById("office_id").value;
+            socket.send(office_id)
+            e.preventDefault();
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-5">Hi, {{ admin.first_name }} {{ admin.last_name }}! Here is a list of all vehicles in your company that do not belong to any office.</h1>
+        <ul class="list-group list-group-flush">
+            {% for vehicle in vehicles %}
+                <li class="list-group-item">
+                    <div class="row">
+                        <div class="col-auto">
+                            {{ vehicle.name }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ vehicle.licence_plate }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ vehicle.model }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ vehicle.year_of_manufacture }}
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
